@@ -1346,6 +1346,3 @@ foreach {id count} [array get single] {
 }
 
 puts [array size fabric]
-#foreach k [array names fabric] {
-#	puts $fabric($k)
-#}
