@@ -2,21 +2,21 @@ set input {XxSsdDIijNnJACszZScZfFhHQyYrRqzdXTtxDEeNnGgOaAcCMcCLlMmogQeEqGgFfGyYu
 
 
 set chars {}
-for {set i 0} {$i<26} {incr i} {
-	lappend chars [format %c [expr 97+$i]]
-}
 set patterns {}
-foreach char $chars {
-	lappend patterns "[string tolower $char][string toupper $char]"
-	lappend patterns "[string toupper $char][string tolower $char]"
+
+for {set i 0} {$i<26} {incr i} {
+	set char [format %c [expr 97+$i]]
+	lappend patterns "[string tolower $char][string toupper $char] [string toupper $char][string tolower $char]"
+	lappend chars $char
 }
+
 
 foreach char $chars {
 	regsub -all -nocase $char $input "" processed
 	set reduced -1
 	while {$reduced!=0} {
 		set reduced 0
-		foreach pattern $patterns {
+		foreach pattern [join $patterns] {
 			incr reduced [regsub -all $pattern $processed "" processed]
 		}
 	}
