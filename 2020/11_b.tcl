@@ -115,14 +115,14 @@ proc freeAdj {seats colnum rownum} {
 	set prev [lrange [lindex $seats [expr $colnum -1]] [expr $rownum -1] [expr $rownum+1] ]
 	set next [lrange [lindex $seats [expr $colnum +1]] [expr $rownum -1] [expr $rownum+1] ]
 	set this [lrange [lindex $seats [expr $colnum]] [expr $rownum -1] [expr $rownum+1] ]
+	
 	if {$rownum==0} {
 		set this [lreplace $this 0 0]
 	} else {
 		set this [lreplace $this 1 1]
 	}
 	
-	set taken [llength [lsearch -all [join [list $prev $next $this]] "#"]]
-	return $taken
+	return [llength [lsearch -all [join [list $prev $next $this]] "#"]]
 
 }
 
@@ -135,18 +135,15 @@ while {1} {
 			set this [lindex $seats $col $row]
 			if {$this=="."} {continue}
 			if {$this=="L"} { 
-				set taken [freeAdj $seats $col $row]
-				if {$taken==0} {
+				if {[freeAdj $seats $col $row]==0} {
 					lset buffer [list $col $row] "#"
 				}
 			}
 			
 			if {$this=="#"} {
-				set taken [freeAdj $seats $col $row]
-				if {$taken>=4} {
+				if {[freeAdj $seats $col $row]>=4} {
 					lset buffer [list $col $row] "L"
 				}
-		
 			}
 		
 		}
