@@ -92,42 +92,68 @@ LLLLLL.LLLLLLLLLLLLLLL.LL.LLLLLLLLLLLLLLLL.LLLLLLLLLLLLLLLL.LLLLLL.LLLLLLL.LLLLL
 LLLLL..LLLLLLLLLLLL.LLLLL.LLLLLLL.LLLLLLLL.LLLLLL.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.LLLLLL.LLL.LL
 LLLLLL.LLLLLL.LLLLLLLLLLL.LLLLLLL.LLLLLLLLLLLLLLL.LLLLLLLLL.LLLLLLL.LLLLLLLL.LLLLLLLLLLLLL.LLLLLL}
 
-set input2 {L.LL.LL.LL
-LLLLLLL.LL
-L.L.L..L..
-LLLL.LL.LL
-L.LL.LL.LL
-L.LLLLL.LL
-..L.L.....
-LLLLLLLLLL
-L.LLLLLL.L
-L.LLLLL.LL}
+set input2 {
+.......#.
+...#.....
+.#.......
+.........
+..#L....#
+....#....
+.........
+#........
+...#.....
+}
 
 set seats {}
+
 foreach line $input {	
 	lappend seats [split $line {}]
 }
 
 set buffer $seats
 
-proc freeAdj {seats colnum rownum} {
-
-	set prev [lrange [lindex $seats [expr $colnum -1]] [expr $rownum -1] [expr $rownum+1] ]
-	set next [lrange [lindex $seats [expr $colnum +1]] [expr $rownum -1] [expr $rownum+1] ]
-	set this [lrange [lindex $seats [expr $colnum]] [expr $rownum -1] [expr $rownum+1] ]
-	
-	if {$rownum==0} {
-		set this [lreplace $this 0 0]
-	} else {
-		set this [lreplace $this 1 1]
-	}
-	
-	return [llength [lsearch -all [join [list $prev $next $this]] "#"]]
-
-}
-
 set cols [llength $seats]
 set rows [llength [lindex $seats 0]]
+
+
+
+proc freeAdj {seats rownum colnum} {
+	
+	set beams {
+		{-1 -1} {0 -1} {1 -1}
+		{-1 0} {1 0}
+		{-1 1} {0 1} {1 1}
+	}
+	
+	set occ 0
+	foreach beam $beams {
+	puts "beam $beam"
+	
+		lassign $beam dx dy
+		set stop 0
+		set col $colnum
+		set row $rownum
+		
+		while {$stop==0} {
+		
+			incr row $dy
+			incr col $dx
+			#puts "$row $col"	
+			if {$row<0 || $row==[llength $seats] || $col<0 || $col==[llength [lindex $seats 0]]} {
+				set stop 1
+			}
+			
+			set seat [lindex [lindex $seats $row] $col]
+			if {$seat=="#"} {incr occ}
+			puts "$col $row $seat $occ"	
+		
+		}
+
+	}
+	puts $occ
+}
+freeAdj $seats 4 3 
+exit
 
 while {1} {
 	for {set col 0} {$col<$cols} {incr col} {
