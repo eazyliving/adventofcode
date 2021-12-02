@@ -771,33 +771,35 @@ F11
 set x 0
 set y 0
 set deg 90
-set heading e
 
-set headings {{y -} 0 {x +} 90 {y +} 180 {x -} 270}
-set heading {x +}
+set PI 3.1415926536
+set wp {10 1}
+set wpb {}
 
-set wp {10 -1}
+
 set subs {
 	
-	{N([0-9]+)} {set wp [list [lindex $wp 0][expr [lindex $wp 1] -\1]]}
-	{S([0-9]+)} {set wp [list [lindex $wp 0][expr [lindex $wp 1] \1]]}
-	{W([0-9]+)} {set wp [list [expr [lindex $wp 0] -\1] [lindex $wp 1]]}
-	{E([0-9]+)} {set wp [list [expr [lindex $wp 0] 1] [lindex $wp 1]]}
-	{L([0-9]+)} {
-incr deg -\1;
-if {$deg<0} {set deg [expr $deg+360]};
-set heading [lindex $headings [expr [lsearch $headings $deg] -1]];
+	{N([0-9]+)} {lset wp 1 [expr [lindex $wp 1] +\1]}
+	{S([0-9]+)} {lset wp 1 [expr [lindex $wp 1] -\1]}
+	{W([0-9]+)} {lset wp 0 [expr [lindex $wp 0] -\1]}
+	{E([0-9]+)} {lset wp 0 [expr [lindex $wp 0] +\1]}
+	{([L,R])([0-9]+)} {
+	set deg \2
+if ("\1"=="R") {set deg [expr \2 *-1]}
+lset wpb 0 [expr round([lindex $wp 0] * cos($deg*($PI/180.0)) - [lindex $wp 1] * sin($deg*($PI/180.0)))] 
+lset wpb 1 [expr round([lindex $wp 0] * sin($deg*($PI/180.0)) + [lindex $wp 1] * cos($deg*($PI/180.0)))] ;
+set wp $wpb 
 	}
-	{R([0-9]+)} {
-incr deg \1;
-if {$deg>=360} {set deg [expr $deg-360]};
-set heading [lindex $headings [expr [lsearch $headings $deg] -1]];
+	{F([0-9]+)} {
+set x [expr $x + [lindex $wp 0] * \1]
+set y [expr $y + [lindex $wp 1] * \1]
+	}
 
-	}
-	{F([0-9]+)} {set wp [list [expr [lindex $wp 0] * \1] [] [expr [lindex $wp 1 * \1]]] }
+}
 
 foreach {search sub} $subs {
 	regsub -all $search $input $sub input
 }
+
 eval $input
 puts [expr abs($x)+abs($y)]
