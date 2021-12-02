@@ -776,12 +776,13 @@ set heading e
 set headings {{y -} 0 {x +} 90 {y +} 180 {x -} 270}
 set heading {x +}
 
+set wp {10 -1}
 set subs {
 	
-	{N([0-9]+)} {incr y -\1}
-	{S([0-9]+)} {incr y \1}
-	{W([0-9]+)} {incr x -\1}
-	{E([0-9]+)} {incr x +\1}
+	{N([0-9]+)} {set wp [list [lindex $wp 0][expr [lindex $wp 1] -\1]]}
+	{S([0-9]+)} {set wp [list [lindex $wp 0][expr [lindex $wp 1] \1]]}
+	{W([0-9]+)} {set wp [list [expr [lindex $wp 0] -\1] [lindex $wp 1]]}
+	{E([0-9]+)} {set wp [list [expr [lindex $wp 0] 1] [lindex $wp 1]]}
 	{L([0-9]+)} {
 incr deg -\1;
 if {$deg<0} {set deg [expr $deg+360]};
@@ -793,10 +794,7 @@ if {$deg>=360} {set deg [expr $deg-360]};
 set heading [lindex $headings [expr [lsearch $headings $deg] -1]];
 
 	}
-	{F([0-9]+)} {eval [subst "incr [lindex $heading 0] [lindex $heading 1]\1"]}
-
-	
-}
+	{F([0-9]+)} {set wp [list [expr [lindex $wp 0] * \1] [] [expr [lindex $wp 1 * \1]]] }
 
 foreach {search sub} $subs {
 	regsub -all $search $input $sub input
