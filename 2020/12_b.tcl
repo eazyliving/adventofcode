@@ -784,7 +784,7 @@ set subs {
 	{W([0-9]+)} {lset wp 0 [expr [lindex $wp 0] -\1]}
 	{E([0-9]+)} {lset wp 0 [expr [lindex $wp 0] +\1]}
 	{([L,R])([0-9]+)} {
-	set deg \2
+set deg \2
 if ("\1"=="R") {set deg [expr \2 *-1]}
 lset wpb 0 [expr round([lindex $wp 0] * cos($deg*($PI/180.0)) - [lindex $wp 1] * sin($deg*($PI/180.0)))] 
 lset wpb 1 [expr round([lindex $wp 0] * sin($deg*($PI/180.0)) + [lindex $wp 1] * cos($deg*($PI/180.0)))] ;
