@@ -92,17 +92,16 @@ LLLLLL.LLLLLLLLLLLLLLL.LL.LLLLLLLLLLLLLLLL.LLLLLLLLLLLLLLLL.LLLLLL.LLLLLLL.LLLLL
 LLLLL..LLLLLLLLLLLL.LLLLL.LLLLLLL.LLLLLLLL.LLLLLL.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.LLLLLL.LLL.LL
 LLLLLL.LLLLLL.LLLLLLLLLLL.LLLLLLL.LLLLLLLLLLLLLLL.LLLLLLLLL.LLLLLLL.LLLLLLLL.LLLLLLLLLLLLL.LLLLLL}
 
-set input2 {
-.......#.
-...#.....
-.#.......
-.........
-..#L....#
-....#....
-.........
-#........
-...#.....
-}
+set input2 {L.LL.LL.LL
+LLLLLLL.LL
+L.L.L..L..
+LLLL.LL.LL
+L.LL.LL.LL
+L.LLLLL.LL
+..L.L.....
+LLLLLLLLLL
+L.LLLLLL.L
+L.LLLLL.LL}
 
 set seats {}
 
@@ -112,12 +111,10 @@ foreach line $input {
 
 set buffer $seats
 
-set cols [llength $seats]
-set rows [llength [lindex $seats 0]]
+set rows [llength $seats]
+set cols [llength [lindex $seats 0]]
 
-
-
-proc freeAdj {seats rownum colnum} {
+proc occupied {seats rownum colnum} {
 	
 	set beams {
 		{-1 -1} {0 -1} {1 -1}
@@ -127,48 +124,54 @@ proc freeAdj {seats rownum colnum} {
 	
 	set occ 0
 	foreach beam $beams {
-	puts "beam $beam"
 	
+		global round 
 		lassign $beam dx dy
 		set stop 0
 		set col $colnum
 		set row $rownum
 		
-		while {$stop==0} {
 		
-			incr row $dy
+		while {$stop==0} {
+			
 			incr col $dx
-			#puts "$row $col"	
+			incr row $dy
+			
 			if {$row<0 || $row==[llength $seats] || $col<0 || $col==[llength [lindex $seats 0]]} {
 				set stop 1
 			}
 			
-			set seat [lindex [lindex $seats $row] $col]
-			if {$seat=="#"} {incr occ}
-			puts "$col $row $seat $occ"	
+			set seat [lindex $seats $row $col]
+			if {$seat=="#"} {incr occ;set stop 1}
+			if {$seat=="L"} {set stop 1}
 		
 		}
 
 	}
-	puts $occ
+	return $occ
 }
-freeAdj $seats 4 3 
-exit
+
+set round 0
 
 while {1} {
-	for {set col 0} {$col<$cols} {incr col} {
-		for {set row 0} {$row<$rows} {incr row} {
-			set this [lindex $seats $col $row]
+	
+	for {set row 0} {$row<$rows} {incr row} {
+		for {set col 0} {$col<$cols} {incr col} {
+			
+			set this [lindex $seats $row $col]
+			
+			
 			if {$this=="."} {continue}
+			
 			if {$this=="L"} { 
-				if {[freeAdj $seats $col $row]==0} {
-					lset buffer [list $col $row] "#"
+				if {[occupied $seats $row $col]==0} {
+					lset buffer [list $row $col] "#"
 				}
 			}
 			
 			if {$this=="#"} {
-				if {[freeAdj $seats $col $row]>=4} {
-					lset buffer [list $col $row] "L"
+				if {[occupied $seats $row $col]>=5} {
+					lset buffer [list $row $col] "L"
 				}
 			}
 		
@@ -183,4 +186,5 @@ while {1} {
 	
 	}
 	set seats $buffer
+	
 }
