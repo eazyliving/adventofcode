@@ -593,24 +593,57 @@ mem[43716] = 411505145
 mem[3338] = 661
 mem[2430] = 2635}
 
-regsub -all "\=" $input "" input
+set input2 {mask = 000000000000000000000000000000X1001X
+mem[42] = 100
+mask = 00000000000000000000000000000000X0XX
+mem[26] = 1
+}
+
+regsub -all {\=} $input "" input
 regsub -all {mem\[} $input "" input
 regsub -all {\]} $input "" input
 
-puts $input;exit;
-set mask ""
+
 foreach {command value}  $input {
 	
-	if {$command=="mask"} {set mask $value;continue}
-	set bval [format "%036b" $value]
-	for {set i 0} {$i<36} {incr i} {
-		if {[string index $mask $i]!="X"} {
-			set bval [string replace $bval $i $i [string index $mask $i]]
-		}
+	if {$command=="mask"} {
+		set mask $value
+		continue	
 	}
 	
-	set value [expr "0b$bval"]
-	eval "set $command  $value"
+	set addr [format "%036b" $command]
+	
+	for {set i 0} {$i<36} {incr i} {
+		if {[string index $mask $i]=="1"} {
+			set addr [string replace $addr $i $i 1]
+		}
+		if {[string index $mask $i]=="X"} {
+			set addr [string replace $addr $i $i X]
+		}
+
+	}
+
+	set width [llength [lsearch -all -inline [split $mask {}] X]]
+	set bits [lsearch -all [split $mask {}] X]
+
+	for {set x 0} {$x<[expr 1<<$width]} {incr x} {
+	
+		set newaddr $addr
+		set source [format [format "%%0%db" $width] $x]
+
+		set bit 0
+
+		foreach pos $bits {
+			set newaddr [string replace $newaddr $pos $pos [string index $source $bit]]
+			incr bit
+		}
+
+		
+		set mem([expr "0b$newaddr"]) $value
+		set xa [expr "0b$newaddr"]
+		
+	}
+	
 	
 }
 
