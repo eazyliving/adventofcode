@@ -593,11 +593,6 @@ mem[43716] = 411505145
 mem[3338] = 661
 mem[2430] = 2635}
 
-set input2 {mask = 000000000000000000000000000000X1001X
-mem[42] = 100
-mask = 00000000000000000000000000000000X0XX
-mem[26] = 1
-}
 
 regsub -all {\=} $input "" input
 regsub -all {mem\[} $input "" input
