@@ -599,6 +599,7 @@ set input {83,69,34,46,30,23,19,75,22,37,89,78,32,39,11,44,95,43,26,48,84,53,94,
 66 51 46 77 15
 34 36 47 80 14
  7 89 62  9 49}
+
  
 set draws [split [lindex $input 0] ,]
 regsub -all "\n\n" $input "|" output
@@ -611,14 +612,20 @@ foreach line $output {
 	lappend boards [split $line ,]
 
 }
+set wins {}
+set lastdraws {}
 
 foreach draw $draws {
 	set b 0
 	foreach board $boards {
-
+		
+		if {[lsearch $wins $b]!=-1} {
+			incr b	;continue
+		}
+		
 		set l 0
 		foreach line $board {
-			#puts -nonewline " $line | $draw | "
+		
 			set pos [lsearch $line $draw]
 			if {$pos!=-1} {
 				
@@ -627,22 +634,21 @@ foreach draw $draws {
 				set boards [lreplace $boards $b $b $board]
 
 			}
-			
+			set strike 0
 			for {set c 0} {$c<5} {incr c} {
-			
 				if {[lsort -unique [lmap xline $board {lindex $xline $c}]]=="."} {
-					regsub -all {\.} [join $board] "" board
-					puts [expr ([join $board +]) * $draw]
-					exit
-				
+					set strike 1
 				}
-			
 			}
 			
 			if {$line==". . . . ." } {
-				regsub -all {\.} [join $board] "" board
-				puts [expr ([join $board +]) * $draw]
-				exit
+				set strike 1
+			}
+			
+			if {$strike==1} {
+				lappend wins $b
+				lappend lastdraw $draw
+				break
 			}
 			
 			incr l
@@ -650,5 +656,8 @@ foreach draw $draws {
 		incr b	
 	}
 	
-
 }
+
+set board [lindex $boards [lindex $wins end]]
+regsub -all {\.} [join $board] "" board
+puts [expr ([join $board +]) * [lindex $lastdraw end]]
