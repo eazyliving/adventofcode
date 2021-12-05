@@ -322,11 +322,8 @@ while {[llength $links]!=[llength $allnames]} {
 		foreach num $ticket {
 		
 			foreach name $leftnames {
-				set b1 [lindex [lindex $f($name) 0] 1]
-				set b2 [lindex [lindex $f($name) 1] 0]
-				if {$num>$b1 && $num<$b2} {
-					set found [lsearch $probs($pos) $name]
-					set probs($pos) [lreplace $probs($pos) $found $found]
+				if {$num>[lindex [lindex $f($name) 0] 1] && $num<[lindex [lindex $f($name) 1] 0]} {
+					set probs($pos) [lreplace $probs($pos) [lsearch $probs($pos) $name] [lsearch $probs($pos) $name]]
 				}
 			}
 			incr pos
