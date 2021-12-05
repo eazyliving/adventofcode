@@ -760,14 +760,6 @@ F92
 S3
 F3}
 
-set input2 {F10
-N3
-F7
-R90
-F11
-}
-
-
 set x 0
 set y 0
 set deg 90
@@ -776,6 +768,10 @@ set PI 3.1415926536
 set wp {10 1}
 set wpb {}
 
+# Sonst ja keine Kommentare, aber hier: Ersetze die Navigationsbefehle durch tcl-code
+# das ist echt hässlich. Aber geil :d
+# Code ersetzen, direkt ausführen, fertig
+# Machmal liebe ich tcl 
 
 set subs {
 	
@@ -783,16 +779,18 @@ set subs {
 	{S([0-9]+)} {lset wp 1 [expr [lindex $wp 1] -\1]}
 	{W([0-9]+)} {lset wp 0 [expr [lindex $wp 0] -\1]}
 	{E([0-9]+)} {lset wp 0 [expr [lindex $wp 0] +\1]}
+
 	{([L,R])([0-9]+)} {
-set deg \2
-if ("\1"=="R") {set deg [expr \2 *-1]}
-lset wpb 0 [expr round([lindex $wp 0] * cos($deg*($PI/180.0)) - [lindex $wp 1] * sin($deg*($PI/180.0)))] 
-lset wpb 1 [expr round([lindex $wp 0] * sin($deg*($PI/180.0)) + [lindex $wp 1] * cos($deg*($PI/180.0)))] ;
-set wp $wpb 
+		set deg \2
+		if ("\1"=="R") {set deg [expr \2 *-1]}
+		lset wpb 0 [expr round([lindex $wp 0] * cos($deg*($PI/180.0)) - [lindex $wp 1] * sin($deg*($PI/180.0)))] 
+		lset wpb 1 [expr round([lindex $wp 0] * sin($deg*($PI/180.0)) + [lindex $wp 1] * cos($deg*($PI/180.0)))] ;
+		set wp $wpb 
 	}
+
 	{F([0-9]+)} {
-set x [expr $x + [lindex $wp 0] * \1]
-set y [expr $y + [lindex $wp 1] * \1]
+		set x [expr $x + [lindex $wp 0] * \1]
+		set y [expr $y + [lindex $wp 1] * \1]
 	}
 
 }
