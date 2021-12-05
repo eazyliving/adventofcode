@@ -262,32 +262,21 @@ nearby tickets:
 119,457,222,687,479,827,444,529,417,627,547,312,311,826,683,62,568,406,326,848
 591,319,492,280,644,246,293,245,309,879,494,439,676,446,115,136,213,936,127,511}
 
-set input2 {class: 1-3 or 5-7
-row: 6-11 or 33-44
-seat: 13-40 or 45-50
-
-your ticket:
-7,1,14
-
-nearby tickets:
-7,3,47
-40,4,50
-55,2,20
-38,6,12}
-
 regsub -all "\n\n" $input "|" input
 lassign [split $input "|"] fields myticket tickets
 
 set tickets [lmap t [lrange $tickets 2 end] {split $t ,}]
-set myticket [split $myticket ,]
+set myticket [split [string range $myticket [string first ":" $myticket]+2 end] ,]
 
 set fields [split $fields "\n"]
+set allnames {}
+
 foreach field $fields {
 	set name [string range $field 0 [string first ":" $field]-1]
 	set one [split [lindex $field end-2] -]
 	set two [split [lindex $field end] -]
 	set f($name) [list $one $two]
-	
+	lappend allnames $name
 }
 
 set valid {}
@@ -296,57 +285,74 @@ foreach ticket $tickets {
 
 	incr pos
 	set buf {}
-
+	set ticketbuf $ticket
 	foreach num $ticket {
-		foreach {name ranges} [array get f] {
-			foreach range $ranges {
-				if {$num>=[lindex $range 0] && $num<=[lindex $range 1]} {
-					lappend buf $num
-					break;
-				}
+		foreach name $allnames {
+			set r0 [lindex $f($name) 0]		
+			set r1 [lindex $f($name) 1]
+			if { 
+				(($num>=[lindex $r0 0]) && ($num<=[lindex $r0 1]))||
+				(($num>=[lindex $r1 0]) && ($num<=[lindex $r1 1]))
+			} {
+				set ticket [lreplace $ticket [lsearch $ticket $num] [lsearch $ticket $num]]
 			}
 		}
 	}
 
-	if {[llength [lsort -unique $buf]]==[llength $ticket]} {
-		lappend valid $ticket
-	}
+	if {[llength $ticket]==0} {
+		lappend valid $ticketbuf
+	} 
 }
 
 set tickets $valid
 
-foreach ticket $tickets {
+
+set links {}
+set leftnames $allnames
+
+while {[llength $links]!=[llength $allnames]} {
+
+	for {set x 0} {$x<[llength [lindex $tickets 0]]} {incr x} {
+		set probs($x) $leftnames
+	}
+
+	foreach ticket $tickets {
 	
-	set pos 0
-	
-	foreach num $ticket {
+		set pos 0
+		foreach num $ticket {
 		
-		foreach {name ranges} [array get f] {
-			foreach range $ranges {
-				if {$num>=[lindex $range 0] && $num<=[lindex $range 1]} {
-					puts "$num $name $range"
-					lappend prob($pos) $name
-					break
+			foreach name $leftnames {
+				set b1 [lindex [lindex $f($name) 0] 1]
+				set b2 [lindex [lindex $f($name) 1] 0]
+				if {$num>$b1 && $num<$b2} {
+					set found [lsearch $probs($pos) $name]
+					set probs($pos) [lreplace $probs($pos) $found $found]
 				}
 			}
+			incr pos
 		}
-		incr pos
+	}
+
+	foreach {num names} [array get probs] {
+		set fields [lsort -unique $names]
+		if {[llength $fields]==1} {
+			lappend links [list $num $fields]
+			set leftnames [lreplace $leftnames  [lsearch $leftnames [join $fields]]   [lsearch $leftnames [join $fields]]]
+			
+		}	
 	}
 	
+	if {[llength $allnames]==[llength $leftnames]} {
 	
-}
-
-foreach {num names} [array get prob] {
-
-	puts [llength [lsort -unique $names]]
+		puts "OOPS!" 
+		exit
 		
+	}
 }
 
-exit
-foreach {num names} [array get prob] {
-	set fields [lsort -unique $names]
-	
-	if {[llength $fields]==1} {puts "$num is $fields"}
-
+set deps {}
+foreach dep [lsearch -all -index 1 $links *depart*] {
+	lappend deps [lindex $myticket [lindex $links $dep 0]]
 }
 
+puts [expr [join $deps *]]
