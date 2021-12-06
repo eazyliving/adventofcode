@@ -612,6 +612,7 @@ foreach line $output {
 	lappend boards [split $line ,]
 
 }
+
 set wins {}
 set lastdraws {}
 
