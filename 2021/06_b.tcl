@@ -9,7 +9,6 @@ foreach fish $fishes {
 }
 
 for {set day 0} {$day<$days} {incr day} {
-#puts $day
 	
 	for {set i 1} {$i<9} {incr i} {
 		if {[info exists pop($i)]} {
