@@ -6,14 +6,9 @@ set idx 0
 
 foreach in $input {
 	
-	set w1 [expr [join [lrange $input $idx [expr $idx +2]] +]]
-	set w2 [expr [join [lrange $input [expr $idx +1] [expr $idx +3]] +]]
+	incr count [expr [expr [join [lrange $input [expr $idx +1] [expr $idx +3]] +]]>[expr [join [lrange $input $idx [expr $idx +2]] +]]]
 	
-	if {$w2>$w1} {incr count}
-	incr idx
-	
-	if {$idx>[llength $input]-2} {break}
-	
+	if {[incr idx]>[llength $input]-2} {break}
 	
 }
 
