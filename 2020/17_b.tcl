@@ -18,7 +18,6 @@ proc actives {x y z w} {
 		for {set x1 [expr $x-1]} {$x1<=$x+1} {incr x1} {
 			for {set y1 [expr $y-1]} {$y1<=$y+1} {incr y1} {
 				for {set w1 [expr $w-1]} {$w1<=$w+1} {incr w1} {
-				#puts "$x1 $y1 $z1 "
 
 					if {$x1==$x&&$y1==$y&&$z1==$z&&$w1==$w} {continue}
 
@@ -42,6 +41,7 @@ set rounds 6
 set y 0
 set z 0
 set w 0
+
 foreach line $input {
 	set x 0
 	foreach status [split $line {}] {
@@ -78,8 +78,6 @@ for {set round 0} {$round<$rounds} {incr round} {
 	array set matrix [array get buf]
 	
 }
-
-#puts [lsort [array names matrix *,0]]
 
 set count 0
 foreach {key val} [array get matrix] {
