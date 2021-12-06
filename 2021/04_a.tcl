@@ -618,7 +618,6 @@ foreach draw $draws {
 
 		set l 0
 		foreach line $board {
-			#puts -nonewline " $line | $draw | "
 			set pos [lsearch $line $draw]
 			if {$pos!=-1} {
 				
