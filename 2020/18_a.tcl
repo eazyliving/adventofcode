@@ -395,24 +395,19 @@ proc exprNP term {
 	return $term;
 }
 
-
 proc evalP {term} {
-	puts $term
 	set subs [regsub -all {\(([0-9]+) ([\+,\*]) ([0-9]+)\)} $term {[exprNP \1 \2 \3]} term]
-	puts $term
-	
-	exit
-	set subs [regexp {\(([^A])+\)} $term a ]
-	puts $a
 	
 	if {$subs==0} {
 		return [exprNP $term]
 	} else {
-		regsub 
+		regsub term 
 	}
 	return $term
 }
 
+puts [exprNP "2 + 3 * 4 + 6 * 3"]
+exit
 set subs 99
 puts [evalP "(2 * 4)"]
 exit
