@@ -19,8 +19,10 @@ set points {h 1 b 2 d 3 f 4}
 set completions {}
 
 foreach line $input {
+	
 	set stack {}
 	set error 0
+	
 	foreach par [split $line {}] {
 		set f [lsearch $toStack $par]
 		if {[expr $f % 2]==0} {
@@ -34,15 +36,16 @@ foreach line $input {
 			}
 		}
 	}
+	
 	if {$error==0} {lappend completions [lreverse $stack]}
+
 }
 
 set scorelist {}
 foreach line $completions {
 	set score 0
 	foreach par $line {
-		set sp [lindex $points [expr [lsearch $points $par]+1]]
-		set score [expr $score * 5 + $sp]
+		set score [expr $score * 5 + [lindex $points [expr [lsearch $points $par]+1]]]
 	}
 	lappend scorelist $score
 }
