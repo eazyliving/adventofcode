@@ -9,15 +9,13 @@ Tcl is my language of choice for over 25 years now for quick solutions on more c
 
 So you won't find things like that:
 
-´´´
-
+```
 set b [lindex c 1]
 set a [lreplace $a $b $b "newval"]
 
 #would be
 
 set a [lreplace $a [lindex c 1] [lindex c 1] "newval"]
-
-´´´
+```
 
 Thanks for reading!
