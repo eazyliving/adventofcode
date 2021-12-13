@@ -848,28 +848,6 @@ fold along y=27
 fold along y=13
 fold along y=6}
 
-set input2 {6,10
-0,14
-9,10
-0,3
-10,4
-4,11
-6,0
-6,12
-4,1
-0,13
-10,12
-3,4
-3,0
-8,4
-1,10
-2,14
-8,10
-9,0
-
-fold along y=7
-fold along x=5}
-
 regsub -all "\n\n" $input "|" input
 
 lassign [split $input "|"] coords folds
@@ -877,6 +855,7 @@ lassign [split $input "|"] coords folds
 set h [lindex [lsort -integer [lmap c [split $coords "\n"] {lindex [split $c ","] end}]] end]
 set w [lindex [lsort -integer [lmap c [split $coords "\n"] {lindex [split $c ","] 0}]] end]
 incr w;incr h
+
 set matrix [lrepeat $h [lrepeat $w .]]
 
 foreach coord $coords {
@@ -920,4 +899,3 @@ foreach fold [split $folds "\n"] {
 }
 
 lmap l $matrix {puts [join $l]}
-puts [llength [lsearch -all [join $matrix] {#}]]
