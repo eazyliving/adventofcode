@@ -101,36 +101,43 @@ SB -> H
 NK -> B
 SF -> H}
 
-
 regsub "\n\n" $input "|" input
 regsub -all "\n" $input "$" input
 
 set chain [lindex [split $input "|" ] 0]
 
 set rules [split [join [lrange [split $input "|"] 1 end] ] "$"]
-foreach rule $rules {
-	lappend r [list [lindex $rule 0] [lindex $rule end]]
-}
 
-set rules $r
+foreach r $rules {
+	set rule([lindex $r 0]) "[string index [lindex $r 0] 0][lindex $r end] [lindex $r end][string index [lindex $r 0] 1]"
+}
 
 set rounds 40
 set round -1
 
-while {[incr round]<$rounds} {
-	puts $round
-	set buf ""
-	for {set i 0} {$i<[string length $chain]-1} {incr i} {
+for {set i 0} {$i<[string length $chain]-1} {incr i} {
+	incr pairs([string range $chain $i $i+1]) 
+}
 	
-		if {$i==0} {append buf [string index $chain $i]}
-		append buf [lindex $rules [lsearch -index 0 $rules [string range $chain $i $i+1]] 1][string index $chain $i+1]
-		
+while {[incr round]<$rounds} {
+	
+	foreach {key val} [array get pairs] {
+		incr buf([lindex $rule($key) 0]) $val
+		incr buf([lindex $rule($key) 1]) $val
 	}
-	set chain $buf
+
+	array unset pairs
+	array set pairs [array get buf]
+	array unset buf
 }
 
-foreach letter [lsort -unique [split $chain {}]] {
-	lappend sort [list $letter [llength [lsearch -all [split $chain {}] $letter]]]
+foreach {key val} [array get pairs] {
+	incr letters([string index $key 0]) $val
+	incr letters([string index $key 1]) $val
+}
+
+foreach {l count} [array get letters] {
+	lappend sort [list $l [expr ($count-1)/2+1]]
 }
 
 puts [ expr [lindex [lsort -index 1 -integer $sort] end 1 ] -  [lindex [lsort -index 1 -integer $sort] 0 1 ]]
